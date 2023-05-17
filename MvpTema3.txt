@@ -1,0 +1,156 @@
+USERS:
+- 3 roles
+- table per hierarchy (TPH)
+  - discriminator attribute
+
+Admin:
+- CRUD:
+  - students
+  - professors
+  - subjects
+  - specializations
+  - study years
+  - classes
+  - association between (study year, specialization, subject)
+  - association between (class, subject, professor)
+  - association between (class, student)
+  
+Professor:
+- has access to classes and subjects they teach
+- CRUD:
+  - absences in their own subjects per (class, subject, student, semester)
+  - grades per (class, subject, student, semester)
+  - teaching materials per (subject, semester)
+  - force recalculate grade averages (taking note of teza)
+    - only possible for a student if they have at least 3 grades and passed the teza
+    - cant delete a grade of a student if the average has been calculated
+
+Classmaster:
+- can motivate absences for all subjects in their class
+- view all absences of a student by subject
+- view all unmotivated absences of a student by subject
+- view grade averages of a student per (semester, subject) and overall average
+- view list of students with their grade averages sorted
+- view list of awarded students (I,II,III,mentiune)
+- view list of corigent, show subjects
+- view list of repetent, show subjects
+- view list of students with absences beyond a threshold
+
+Student:
+- can view
+  - teaching materials for all subjects in their class
+  - their grades for all subjects in their class
+  - absences for all subjects in their class
+  - grade averages and overall average
+
+------------------
++ Entities       +
+------------------
+User
+-PK id
+- username
+- password
+- role
+- first name
+- last name
+- creation date
+
+Subject
+-PK id
+- name
+
+Specialization
+-PK id
+- name
+
+Study year
+-PK id
+- name
+
+Semester
+-PK id
+- name
+
+Class
+-PK id
+-FK Study year id
+-FK Specialization id
+-FK classmaster (User id)
+- creation date
+
+Study year specialization subject (contains the subject of a particular study year + specialization combination)
+-PK,FK Study year id
+-PK,FK Specialization id
+-PK,FK Subject id
+- has teza
+
+Class subject
+-PK,FK Class id
+-PK,FK Subject id
+-FK teacher (User id)
+
+Class student
+-PK,FK Class id
+-PK,FK student (User id)
+
+Grade
+-PK id
+-FK student (User id)
+-FK Subject id
+-FK Study year id
+-FK Semester id
+- grade
+- date
+
+Teza grade
+-PK,FK student (User id)
+-PK,FK Subject id
+-PK,FK Study year id
+-PK,FK Semester id
+- grade
+- date
+
+Absence
+-PK id
+-FK student (User id)
+-FK Subject id
+-FK Study year id
+-FK Semester id
+-FK Absence state id
+- reason
+- date
+
+Absence state
+-PK id
+- name
+
+Teaching material
+-PK id
+-FK Class id
+-FK Subject id
+-FK Study year id
+-FK Semester id
+- title
+- description
+- uri
+
+Student subject status
+-PK,FK student (User id)
+-PK,FK Subject id
+-PK,FK Study year id
+-PK,FK Semester id
+- subject average
+- status
+
+Student semester status
+-PK,FK student (User id)
+-PK,FK Study year id
+-PK,FK Semester id
+- semester average
+- status
+
+Student overall status
+-PK,FK student (User id)
+-PK,FK Study year id
+- overall average
+- status
